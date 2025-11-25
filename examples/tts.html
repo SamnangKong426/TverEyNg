@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Text-to-Speech Example</title>
+  </head>
+  <body>
+    <h2>Text-to-Speech Demo</h2>
+    <input
+      type="text"
+      id="text"
+      placeholder="Type something..."
+      style="width: 300px"
+    />
+    <button id="speak">Speak</button>
+
+    <script>
+      const speakButton = document.getElementById("speak");
+      const input = document.getElementById("text");
+
+      speakButton.addEventListener("click", () => {
+        const text = input.value;
+        if (text.trim() === "") return;
+
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        // Optional settings
+        utterance.lang = "km-KH"; // language
+        utterance.rate = 1; // speed (0.1 to 10)
+        utterance.pitch = 1; // pitch (0 to 2)
+        utterance.volume = 1; // volume (0 to 1)
+
+        speechSynthesis.speak(utterance);
+      });
+    </script>
+  </body>
+</html>

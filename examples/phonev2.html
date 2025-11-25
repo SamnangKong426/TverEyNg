@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      body {
+        font-family: "Ubuntu";
+      }
+    </style>
+  </head>
+  <body class="contianer p-10">
+    <div class="h-auto max-w-full">
+      <canvas
+        id="canvas"
+        width="640"
+        height="480"
+        class="rounded-lg border"
+      ></canvas>
+    </div>
+  </body>
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const video = document.createElement("video");
+    video.autoplay = true;
+    video.playsInline = true;
+
+    let latestDetections = [];
+
+    /**
+     * Get camera permission
+     * @param {boolean} useVideo - capture video
+     * @param {boolean} useAudio - capture audio
+     */
+    function askCameraPermission(useVideo = true, useAudio = false) {
+      navigator.mediaDevices
+        .getUserMedia({ video: useVideo, audio: useAudio })
+        .then((stream) => {
+          video.srcObject = stream;
+          video.play();
+          displayFrame();
+        });
+    }
+
+    /**
+     * Display camera frame
+     * return {blob} - the recently capture frame
+     */
+    function displayFrame() {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      drawBoundingBox(latestDetections);
+      requestAnimationFrame(displayFrame);
+    }
+
+    /**
+     * Draw rectangle around the detected object
+     * @param {object} detections - object detection data (cls, conf, xyxy)
+     * @param {ctx} canvas ctx - HTMLelement
+     */
+    function drawBoundingBox(detections) {
+      detections.forEach((det) => {
+        const [x1, y1, x2, y2] = det.xyxy;
+        const label = det.cls;
+
+        // Draw rectangle
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+
+        // Draw label
+        ctx.fillStyle = "red";
+        ctx.font = "18px Arial";
+        ctx.fillText(`${label} ${det.conf.toFixed(2)}`, x1, y1 - 5);
+      });
+    }
+
+    function captureFrame() {
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), "image/jpeg");
+      });
+    }
+
+    /**
+     * Send camera frame to server side
+     * @param {Image} image - image you want to send
+     * @return {object} the human dectection results
+     */
+    async function sendImageFrame(blob) {
+      const url = "http://127.0.0.1:8000/upload";
+      const form = new FormData();
+      form.append("frame", blob, "frame.jpg");
+
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          body: form,
+        });
+        const data = await res.json();
+        return data.detections || [];
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    async function processFrame() {
+      const frame = await captureFrame();
+      const detections = await sendImageFrame(frame);
+      if (detections) latestDetections = detections;
+      setTimeout(processFrame, 100);
+    }
+    /**
+     * Text to speech
+     * @param {string} text - the text you want to convert to speech
+     */
+    function text_to_speech(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+
+      // settings
+      utterance.lang = "en-US"; // language
+      utterance.rate = 1; // speed (0.1 to 10)
+      utterance.pitch = 1; // pitch (0 to 2)
+      utterance.volume = 1; // volume (0 to 1)
+
+      speechSynthesis.speak(utterance);
+    }
+
+    // START
+    askCameraPermission();
+    processFrame();
+  </script>
+</html>

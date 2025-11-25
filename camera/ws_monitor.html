@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>Live Phone Camera Monitor</h2>
+    <img id="video" width="480" />
+    <script>
+      let ws = new WebSocket("ws://localhost:8000/ws_monitor");
+      let img = document.getElementById("video");
+      ws.onmessage = function (event) {
+        img.src = "data:image/jpeg;base64," + event.data;
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    #container {
+      position: relative;
+      width: 100%;
+    }
+    video, canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+    }
+  </style>
+</head>
+<body>
+  <h2>Phone Camera Streaming with YOLO Boxes</h2>
+  <div id="container">
+    <video id="video" autoplay playsinline></video>
+    <canvas id="overlay"></canvas>
+  </div>
+
+  <script>
+    async function start() {
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("overlay");
+      const ctx = canvas.getContext("2d");
+
+      // Get camera
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+        audio: false
+      });
+      video.srcObject = stream;
+
+      const tmpCanvas = document.createElement("canvas");
+      const tmpCtx = tmpCanvas.getContext("2d");
+
+      setInterval(async () => {
+        // Resize overlay canvas
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        tmpCanvas.width = video.videoWidth;
+        tmpCanvas.height = video.videoHeight;
+
+        // Draw current video frame to temp canvas
+        tmpCtx.drawImage(video, 0, 0);
+
+        // Convert to JPEG blob
+        tmpCanvas.toBlob(async (blob) => {
+          const form = new FormData();
+          form.append("frame", blob, "frame.jpg");
+
+          try {
+            const res = await fetch("http://127.0.0.1:8000/upload", {
+              method: "POST",
+              body: form
+            });
+            const data = await res.json();
+
+            // Clear overlay
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (data.success && data.detections) {
+              data.detections.forEach(det => {
+                const [x1, y1, x2, y2] = det.xyxy;
+                const label = det.cls;  // or map class id to name
+
+                // Draw rectangle
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+
+                // Draw label
+                ctx.fillStyle = "red";
+                ctx.font = "18px Arial";
+                ctx.fillText(`${label} ${det.conf.toFixed(2)}`, x1, y1 - 5);
+              });
+            }
+          } catch (err) {
+            console.error("Error:", err);
+          }
+        }, "image/jpeg", 0.6);
+
+      }, 1000); 
+    }
+
+    start();
+  </script>
+</body>
+</html>
