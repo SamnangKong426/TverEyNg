@@ -3,7 +3,7 @@ import streamlit as st
 from threading import Thread
 from queue import Queue
 from utils.mocks.ip_cam import ip_cameras  
-from services.track_obj import predict  
+from app.services.tracker import predict  
 
 st.set_page_config(
     page_title="TverEyNg",

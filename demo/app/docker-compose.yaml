@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: tvereyng
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./:/app   # mount local scripts
+    env_file: 
+      - .env
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    privileged: true
+

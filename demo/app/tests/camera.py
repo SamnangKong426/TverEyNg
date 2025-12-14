@@ -1,8 +1,8 @@
 import streamlit as st
-import src.controllers.camera as camera_controller
 import asyncio
-from src.bot.telegram_bot import alert
 import time
+from bot.telegram_bot import alert
+import controllers.camera as camera_controller
 
 TIMEOUT = 10 
 LAST_ALERT = 0
@@ -18,13 +18,14 @@ async def is_alert(results, annotated_frame):
             await alert_task
             LAST_ALERT = now
 
-
-
+@st.cache_resource
 async def display_camera():
+    """ Display all camera """
     display_frame = st.empty()
 
     for results, annotated_frame in camera_controller.open_camera():
         display_frame.image(annotated_frame, caption="Processed Frame", width="stretch", channels="BGR")
-        await is_alert(results, annotated_frame)
+        asyncio.sleep(0.1)
+        # await is_alert(results, annotated_frame)
        
 

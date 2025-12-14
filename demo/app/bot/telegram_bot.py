@@ -2,7 +2,6 @@ import os
 import dotenv
 import cv2 as cv
 import io
-import asyncio
 from telegram import Bot
 
 dotenv.load_dotenv()
@@ -27,7 +26,7 @@ async def alert(img) -> None:
     img_io.name = 'alert_image.png'  
 
     # Send the image via Telegram bot
-    await bot.send_photo(chat_id=TELEGRAM_GROUP_ID, photo=img_io, caption=caption)
+    await bot.send_photo(chat_id=str(TELEGRAM_GROUP_ID), photo=img_io, caption=caption)
 
 """
     # TODO: Just send only message we don't need to create an application
