@@ -1,5 +1,8 @@
 FROM ultralytics/ultralytics:latest
 
+RUN apt-get update && apt-get install -y mpg123 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Copy your model and any additional files
