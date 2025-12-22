@@ -1,19 +1,15 @@
 import os
 import time
 import json
+import asyncio
 import threading
 import cv2 as cv
 import streamlit as st
-import asyncio
 from ultralytics import YOLO
 from bot.telegram_bot import alert
 
 st.set_page_config(page_title="TverEyNg", page_icon="👋", layout="wide")
 
-# ==============================================================================
-
-if "is_setting" not in st.session_state:
-    st.session_state.is_setting = 0
 
 # ==============================================================================
 
@@ -98,7 +94,7 @@ def play_sound(sound_path):
 
 # ==============================================================================
 
-TIMEOUT = 10
+TIMEOUT = 30
 LAST_ALERT = 0
 
 
@@ -109,7 +105,7 @@ def process_alert(results, annotated_frame):
 
     for r in results:
         if 0 in r.boxes.cls and now - LAST_ALERT >= TIMEOUT:
-            # play_sound("assets/thief_sound.mp3")
+            play_sound("assets/thief_sound.mp3")
             alert_thread = threading.Thread(
                 target=lambda: asyncio.run(alert(annotated_frame))
             )
@@ -123,20 +119,16 @@ def process_alert(results, annotated_frame):
 def set_config():
     @st.dialog("Add your camera")
     def add_camera():
-        st.session_state.is_setting = 1
-
         name = st.text_input("Camera Name")
         ip = st.text_input("IP Camera Address:")
 
         if st.button("Submit"):
             cameras[name] = ip
             save_json(cameras, FILE_PATH)
-            st.rerun(scope="app")
+            st.rerun()
 
     @st.dialog("Delete camera")
     def delete_camera():
-        st.session_state.is_setting = 1
-
         if not cameras:
             st.warning("No cameras to delete")
             return
@@ -147,18 +139,21 @@ def set_config():
             del cameras[camera_to_delete]
             save_json(cameras, FILE_PATH)
             st.success(f"Deleted {camera_to_delete}")
-            st.rerun()
+            st.session_state.clear() # Clear all session state
+            st.cache_data.clear() # Clear all cached data
+            st.rerun() # Rerun the entire script
 
     @st.dialog("Telegram")
     def set_telegram():
-        st.session_state.is_setting = 1
-
         bot_token = st.text_input("Bot Token: ")
         group_id = st.text_input("Group ID: ")
 
         if st.button("Submit"):
-            # TODO: write to database
-            st.rerun(scope="app")
+            cameras["telegram"] = {"bot_token": bot_token, "group_id": group_id}
+            save_json(cameras, FILE_PATH)
+            st.rerun()
+
+
 
     cols = st.columns(2, vertical_alignment="bottom")
 
@@ -220,10 +215,7 @@ for idx, (name, cam) in enumerate(cameras_objects.items()):
 
 def main():
     while True:
-        if st.session_state.is_setting == 1:
-            break
-
-        for name, cam in cameras_objects.items():
+        for idx, (name, cam) in enumerate(cameras_objects.items()):
             ret, frame = cam.read()
 
             if not ret:
