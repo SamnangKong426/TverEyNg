@@ -1,7 +1,7 @@
 import cv2 as cv
 from ultralytics import YOLO
 
-model = YOLO("models/last.pt")
+model = YOLO("models/human.pt")
 model.to("cpu")
 
 
