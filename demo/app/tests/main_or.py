@@ -6,7 +6,7 @@ import cv2 as cv
 import streamlit as st
 import asyncio
 from ultralytics import YOLO
-from bot.telegram_bot import alert
+from bot import alert
 
 st.set_page_config(page_title="TverEyNg", page_icon="👋", layout="wide")
 

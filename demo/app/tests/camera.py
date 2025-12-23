@@ -1,7 +1,7 @@
 import streamlit as st
 import asyncio
 import time
-from bot.telegram_bot import alert
+from bot import alert
 import controllers.camera as camera_controller
 
 TIMEOUT = 10 
