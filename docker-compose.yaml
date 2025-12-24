@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  yolo-service:
+  app:
     build: .
     container_name: telegram-bot
     ports:
