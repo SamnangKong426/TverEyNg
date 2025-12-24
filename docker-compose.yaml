@@ -1,0 +1,29 @@
+services:
+  # FastAPI Backend
+  api:
+    build: .
+    container_name: devops_server
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    networks:
+      - iot_network
+
+  # Pytest Service (Runs tests and then exits)
+  tester:
+    build: .
+    container_name: pytest_runner
+    env_file:
+      - .env
+    depends_on:
+      - api
+    command: python3 -m pytest
+    networks:
+      - iot_network
+
+networks:
+  iot_network:
+    driver: bridge

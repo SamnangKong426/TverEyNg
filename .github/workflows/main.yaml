@@ -1,0 +1,40 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:  
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
+
+      - name: Lint with Ruff
+        run: ruff check . 
+
+      - name: Check Formatting with Ruff
+        run: ruff format . --check
+
+      - name: Run tests
+        run: pytest 
+
+      - name: Run tests with coverage (Terminal Output)
+        run: pytest --cov=. --cov-report=term-missing
+
+      - name: Build and Run Tests
+        run: |
+          docker compose up --build 
+          
+      - name: Shut down services
+        if: always()
+        run: docker-compose down
