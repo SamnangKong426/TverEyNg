@@ -11,7 +11,7 @@ client = TestClient(app)
 
 # 1. Test CREATE a camera
 def test_create_camera():
-    payload = {"name": "Front Door", "ip": "192.168.1.50"}
+    payload = {"name": "Front Door", "ip": "192.168.1.50", "user_id": 1}
     response = client.post("/camera/", json=payload)
 
     assert response.status_code == 200

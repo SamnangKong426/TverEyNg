@@ -1,4 +1,4 @@
 from .camera import router as camera_router
-from .user import router as user_router
+from .auth import router as auth_router
 
-__all__ = ["user_router", "camera_router"]
+__all__ = ["auth_router", "camera_router"]
