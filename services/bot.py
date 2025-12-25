@@ -3,7 +3,7 @@ import tempfile
 import time
 
 import requests
-from services.ultralytics import run_inference
+from services.yolo import run_inference
 
 BOT_URL = "http://127.0.0.1:8001/alert"
 

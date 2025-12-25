@@ -4,7 +4,8 @@ import cv2
 import requests
 
 CAMERA_ID = "1"
-SERVER_URL = f"https://tvereyngserver.onrender.com/api/cameras/upload/{CAMERA_ID}"
+# SERVER_URL = f"https://tvereyngserver.onrender.com/api/cameras/upload/{CAMERA_ID}"
+SERVER_URL = f"http://localhost:8000/api/cameras/upload/{CAMERA_ID}"
 
 
 def start_webcam_stream():
