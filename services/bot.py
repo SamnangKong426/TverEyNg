@@ -5,7 +5,7 @@ import time
 import requests
 from services.yolo import run_inference
 
-BOT_URL = "http://127.0.0.1:8001/alert"
+BOT_URL = "https://tvereyngbot.onrender.com/alert"
 
 
 def alert(image_src):
