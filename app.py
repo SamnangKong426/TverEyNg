@@ -10,4 +10,5 @@ st.set_page_config(page_title="TverEyNg", page_icon="👋", layout="wide")
 # if st.user.is_logged_in:
 #     dashboard()
 
+st.session_state.user_id = 1
 dashboard()

@@ -32,8 +32,8 @@ def dashboard():
     if "is_setting" not in st.session_state:
         st.session_state.is_setting = 0
 
-    # user_id = st.session_state.get("user_id") 
-    user_id = 1
+    user_id = st.session_state.get("user_id") 
+
     if not user_id:
         st.warning("Please log in to view your cameras.")
         return

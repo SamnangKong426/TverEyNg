@@ -70,8 +70,8 @@ def set_config():
         st.title("👋 TverEyNg")
 
         with st.container(horizontal=True, horizontal_alignment="right"):
-            if st.button("Telegram"):
-                set_telegram()
+            # if st.button("Telegram"):
+            #     set_telegram()
 
             if st.button("Add Camera"):
                 add_camera()
@@ -79,5 +79,5 @@ def set_config():
             if st.button("Delete Camera"):
                 delete_camera()
                 
-            if st.button("Log out"):
-                st.logout()
+            # if st.button("Log out"):
+            #     st.logout()
