@@ -1,5 +1,6 @@
-import os
 import io
+import os
+
 import dotenv
 from PIL import Image
 from telegram import Bot
@@ -29,4 +30,11 @@ async def send_alert(image: Image.Image) -> None:
     img_io.seek(0)
     img_io.name = "alert_image.png"
 
-    await bot.send_photo(chat_id=TELEGRAM_GROUP_ID, photo=img_io, caption=caption)
+    await bot.send_photo(
+        chat_id=TELEGRAM_GROUP_ID,
+        photo=img_io,
+        caption=caption,
+        read_timeout=60,
+        write_timeout=60,
+        connect_timeout=60,
+    )
